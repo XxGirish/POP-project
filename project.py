@@ -15,11 +15,16 @@ class Stockitem:
             self.__stock_price = float(input("Enter the price for the stock: "))
         except ValueError as e:
             print(f"Input Error: {e}")
+            exit()
         else:
             print(f"Created Stock with {self.__stock_quantity} units of {self.get_stock_name()}, price {self.__stock_price} each, and code {self.__stock_code}\n\n")
+            
+    def getvat(self):
+        return 17.5
 
     def setstockprice_withvat(self):
-        return self.__stock_price + (self.__stock_price * 0.175)
+        self.vatrate=self.getvat()/100
+        return self.__stock_price + (self.__stock_price * self.vatrate)
 
     def get_stock_name(self):
         return "Unknown Stock Name"
@@ -85,13 +90,15 @@ class Stockitem:
             print(f"Input Error: {e}")
 
     def get_new_price(self):
+        
         try:
             self.new_price = float(input("\n\nEnter the new price of the item: "))
             self.comment= "Changed price "
+            self.update_price()
         except ValueError as e:
             print(f"Input Error: {e}")
-        else:
-            self.update_price()
+          
+                
 
 class NavSys(Stockitem):
     
@@ -172,8 +179,11 @@ class NavSys(Stockitem):
     def change_price_infile(self):
         try:
             self.get_new_price()
-            self.save_data()
-            print("Price updated in file.")
+            if self.new_price>0:
+                self.save_data()
+                print("Price updated in file.")
+            else:
+                print("Error no changes made!")
         except Exception as e:
             print(f"File Error: {e}")
 
@@ -232,8 +242,12 @@ class NavSys(Stockitem):
                     
                     
                 elif self.option == 3:
-                    self.incamount=0
-                    self.increase_stock_infile()
+                    if not self.check_data_exists():
+                        print("Error!! Can't increase stock because the data.csv is empty.\nPlease create a stock first.")
+                    
+                    else:
+                        self.incamount=0
+                        self.increase_stock_infile()
                     
                     
                 elif self.option == 4:
